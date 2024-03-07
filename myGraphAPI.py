@@ -9,6 +9,7 @@ HOST = "https://graph.microsoft.com/v1.0"
 # - User.ReadBasic.All
 # - Application.ReadWrite.OwnedBy
 # - Tasks.ReadWrite.All
+# - Mail.Send
 
 def organize_result(response: Response, expected_status_code: int) -> dict:
     """整理请求结果
@@ -307,4 +308,23 @@ def delete_checklist_item(token: str, userId: str, todoTaskListId: str, todoTask
         "Authorization": f"Bearer {token}"
     }
     return organize_result(response=requests.delete(url=url, headers=headers), expected_status_code=204)
+# ==================================================================================================
+
+# Mail
+# Permission: Mail.Send
+
+## Message
+def send_mail(token: str, userId: str, data: dict) -> dict:
+    """发送邮件
+    :param token: 访问令牌
+    :param userId: 发件者用户ID
+    :param data: 邮件数据
+    :return: 整理后的返回结果
+    """
+    url = f"{HOST}/users/{userId}/sendMail"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json"
+    }
+    return organize_result(response=requests.post(url=url, headers=headers, data=json.dumps(data)), expected_status_code=202)
 # ==================================================================================================
