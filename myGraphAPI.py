@@ -1,6 +1,7 @@
 import requests
 from requests import Response
 import json
+import base64
 
 
 HOST = "https://graph.microsoft.com/v1.0"
@@ -366,17 +367,40 @@ def delete_checklist_item(
 
 
 ## Message
-def send_mail(token: str, userId: str, data: dict) -> dict:
-    """发送邮件
+def send_mail_json(
+    token: str, userId: str, message: dict, saveToSentItems: bool = True
+) -> dict:
+    """发送邮件 (JSON/字典格式)
     :param token: 访问令牌
     :param userId: 发件者用户ID
-    :param data: 邮件数据
+    :param message: JSON/字典格式邮件数据
+    :param saveToSentItems: 是否保存到发件人的SentItems文件夹 (默认为True)
     :return: 整理后的返回结果
     """
     url = f"{HOST}/users/{userId}/sendMail"
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+    data = {
+        "message": message,
+        "saveToSentItems": saveToSentItems,
+    }
     return organize_result(
         response=requests.post(url=url, headers=headers, data=json.dumps(data)),
+        expected_status_code=202,
+    )
+
+
+def send_mail_mime(token: str, userId: str, mime: str) -> dict:
+    """发送邮件 (MIME格式)
+    :param token: 访问令牌
+    :param userId: 发件者用户ID
+    :param mime: MIME格式邮件数据
+    :return: 整理后的返回结果
+    """
+    url = f"{HOST}/users/{userId}/sendMail"
+    headers = {"Authorization": f"Bearer {token}", "Content-Type": "text/plain"}
+    data = base64.b64encode(mime.encode("utf-8")).decode("utf-8")
+    return organize_result(
+        response=requests.post(url=url, headers=headers, data=data),
         expected_status_code=202,
     )
 
