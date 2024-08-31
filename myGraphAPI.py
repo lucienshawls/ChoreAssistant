@@ -11,6 +11,7 @@ HOST = "https://graph.microsoft.com/v1.0"
 # - Tasks.ReadWrite.All
 # - Mail.Send
 
+
 def organize_result(response: Response, expected_status_code: int) -> dict:
     """整理请求结果
     :param response: 请求的响应结果
@@ -22,15 +23,19 @@ def organize_result(response: Response, expected_status_code: int) -> dict:
         "status_code": 0,
         "expected_status_code": expected_status_code,
         "response": {},
-        "response_text": ""
+        "response_text": "",
     }
     result["status_code"] = response.status_code
     result["response_text"] = response.text
-    if "Content-Type" in response.headers and "application/json" in response.headers["Content-Type"]:
+    if (
+        "Content-Type" in response.headers
+        and "application/json" in response.headers["Content-Type"]
+    ):
         result["response"] = response.json()
     if response.status_code == result["expected_status_code"]:
         result["is_success"] = True
     return result
+
 
 # Authentication and authorization
 def get_credential(tenant: str, client_id: str, client_secret: str) -> dict:
@@ -49,10 +54,13 @@ def get_credential(tenant: str, client_id: str, client_secret: str) -> dict:
     }
     response: Response = requests.post(url=url, data=data)
     return organize_result(response=response, expected_status_code=200)
+
+
 # ==================================================================================================
 
 # Users
 # Permission: User.ReadBasic.All
+
 
 ## User
 def list_users(token: str) -> dict:
@@ -61,14 +69,17 @@ def list_users(token: str) -> dict:
     :return: 整理后的返回结果
     """
     url = f"{HOST}/users"
-    headers = {
-        "Authorization": f"Bearer {token}"
-    }
-    return organize_result(response=requests.get(url=url, headers=headers), expected_status_code=200)
+    headers = {"Authorization": f"Bearer {token}"}
+    return organize_result(
+        response=requests.get(url=url, headers=headers), expected_status_code=200
+    )
+
+
 # ==================================================================================================
 
 # Applications
 # Permission: Application.ReadWrite.OwnedBy
+
 
 ## Application
 def list_owners(token: str, client_id: str) -> dict:
@@ -78,14 +89,17 @@ def list_owners(token: str, client_id: str) -> dict:
     :return: 整理后的返回结果
     """
     url = f"{HOST}/applications(appId='{client_id}')/owners"
-    headers = {
-        "Authorization": f"Bearer {token}"
-    }
-    return organize_result(response=requests.get(url=url, headers=headers), expected_status_code=200)
+    headers = {"Authorization": f"Bearer {token}"}
+    return organize_result(
+        response=requests.get(url=url, headers=headers), expected_status_code=200
+    )
+
+
 # ==================================================================================================
 
 # To-do tasks
 # Permission: Tasks.ReadWrite.All
+
 
 ## To-do task list
 def list_task_lists(token: str, userId: str) -> dict:
@@ -95,10 +109,11 @@ def list_task_lists(token: str, userId: str) -> dict:
     :return: 整理后的返回结果
     """
     url = f"{HOST}/users/{userId}/todo/lists"
-    headers = {
-        "Authorization": f"Bearer {token}"
-    }
-    return organize_result(response=requests.get(url=url, headers=headers), expected_status_code=200)
+    headers = {"Authorization": f"Bearer {token}"}
+    return organize_result(
+        response=requests.get(url=url, headers=headers), expected_status_code=200
+    )
+
 
 def create_task_list(token: str, userId: str, data: dict) -> dict:
     """创建一个任务列表
@@ -108,13 +123,14 @@ def create_task_list(token: str, userId: str, data: dict) -> dict:
     :return: 整理后的返回结果
     """
     url = f"{HOST}/users/{userId}/todo/lists"
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json"
-    }
-    return organize_result(response=requests.post(url=url, headers=headers, data=json.dumps(data)), expected_status_code=201)
+    headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+    return organize_result(
+        response=requests.post(url=url, headers=headers, data=json.dumps(data)),
+        expected_status_code=201,
+    )
 
-def get_task_list(token: str, userId: str, todoTaskListId:str) -> dict:
+
+def get_task_list(token: str, userId: str, todoTaskListId: str) -> dict:
     """读取指定任务列表的信息
     :param token: 访问令牌
     :param userId: 用户ID
@@ -122,10 +138,11 @@ def get_task_list(token: str, userId: str, todoTaskListId:str) -> dict:
     :return: 整理后的返回结果
     """
     url = f"{HOST}/users/{userId}/todo/lists/{todoTaskListId}"
-    headers = {
-        "Authorization": f"Bearer {token}"
-    }
-    return organize_result(response=requests.get(url=url, headers=headers), expected_status_code=200)
+    headers = {"Authorization": f"Bearer {token}"}
+    return organize_result(
+        response=requests.get(url=url, headers=headers), expected_status_code=200
+    )
+
 
 def update_task_list(token: str, userId: str, todoTaskListId: str, data: dict) -> dict:
     """更新指定任务列表
@@ -136,13 +153,14 @@ def update_task_list(token: str, userId: str, todoTaskListId: str, data: dict) -
     :return: 整理后的返回结果
     """
     url = f"{HOST}/users/{userId}/todo/lists/{todoTaskListId}"
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json"
-    }
-    return organize_result(response=requests.patch(url=url, headers=headers, data=json.dumps(data)), expected_status_code=200)
+    headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+    return organize_result(
+        response=requests.patch(url=url, headers=headers, data=json.dumps(data)),
+        expected_status_code=200,
+    )
 
-def delete_task_list(token: str, userId: str, todoTaskListId:str) -> dict:
+
+def delete_task_list(token: str, userId: str, todoTaskListId: str) -> dict:
     """删除指定任务列表
     :param token: 访问令牌
     :param userId: 用户ID
@@ -150,11 +168,14 @@ def delete_task_list(token: str, userId: str, todoTaskListId:str) -> dict:
     :return: 整理后的返回结果
     """
     url = f"{HOST}/users/{userId}/todo/lists/{todoTaskListId}"
-    headers = {
-        "Authorization": f"Bearer {token}"
-    }
-    return organize_result(response=requests.delete(url=url, headers=headers), expected_status_code=204)
+    headers = {"Authorization": f"Bearer {token}"}
+    return organize_result(
+        response=requests.delete(url=url, headers=headers), expected_status_code=204
+    )
+
+
 # ==================================================================================================
+
 
 ## To-do task
 def list_tasks(token: str, userId: str, todoTaskListId: str) -> dict:
@@ -165,10 +186,11 @@ def list_tasks(token: str, userId: str, todoTaskListId: str) -> dict:
     :return: 整理后的返回结果
     """
     url = f"{HOST}/users/{userId}/todo/lists/{todoTaskListId}/tasks"
-    headers = {
-        "Authorization": f"Bearer {token}"
-    }
-    return organize_result(response=requests.get(url=url, headers=headers), expected_status_code=200)
+    headers = {"Authorization": f"Bearer {token}"}
+    return organize_result(
+        response=requests.get(url=url, headers=headers), expected_status_code=200
+    )
+
 
 def create_task(token: str, userId: str, todoTaskListId: str, data: dict) -> dict:
     """创建一个指定任务列表下的任务
@@ -179,11 +201,12 @@ def create_task(token: str, userId: str, todoTaskListId: str, data: dict) -> dic
     :return: 整理后的返回结果
     """
     url = f"{HOST}/users/{userId}/todo/lists/{todoTaskListId}/tasks"
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json"
-    }
-    return organize_result(response=requests.post(url=url, headers=headers, data=json.dumps(data)), expected_status_code=201)
+    headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+    return organize_result(
+        response=requests.post(url=url, headers=headers, data=json.dumps(data)),
+        expected_status_code=201,
+    )
+
 
 def get_task(token: str, userId: str, todoTaskListId: str, todoTaskId: str) -> dict:
     """读取指定任务列表下指定任务的信息
@@ -194,12 +217,15 @@ def get_task(token: str, userId: str, todoTaskListId: str, todoTaskId: str) -> d
     :return: 整理后的返回结果
     """
     url = f"{HOST}/users/{userId}/todo/lists/{todoTaskListId}/tasks/{todoTaskId}"
-    headers = {
-        "Authorization": f"Bearer {token}"
-    }
-    return organize_result(response=requests.get(url=url, headers=headers), expected_status_code=200)
+    headers = {"Authorization": f"Bearer {token}"}
+    return organize_result(
+        response=requests.get(url=url, headers=headers), expected_status_code=200
+    )
 
-def update_task(token: str, userId: str, todoTaskListId: str, todoTaskId: str, data: dict) -> dict:
+
+def update_task(
+    token: str, userId: str, todoTaskListId: str, todoTaskId: str, data: dict
+) -> dict:
     """更新指定任务列表下的指定任务
     :param token: 访问令牌
     :param userId: 用户ID
@@ -209,11 +235,12 @@ def update_task(token: str, userId: str, todoTaskListId: str, todoTaskId: str, d
     :return: 整理后的返回结果
     """
     url = f"{HOST}/users/{userId}/todo/lists/{todoTaskListId}/tasks/{todoTaskId}"
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json"
-    }
-    return organize_result(response=requests.patch(url=url, headers=headers, data=json.dumps(data)), expected_status_code=200)
+    headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+    return organize_result(
+        response=requests.patch(url=url, headers=headers, data=json.dumps(data)),
+        expected_status_code=200,
+    )
+
 
 def delete_task(token: str, userId: str, todoTaskListId: str, todoTaskId: str) -> dict:
     """删除指定任务列表下的指定任务
@@ -224,14 +251,19 @@ def delete_task(token: str, userId: str, todoTaskListId: str, todoTaskId: str) -
     :return: 整理后的返回结果
     """
     url = f"{HOST}/users/{userId}/todo/lists/{todoTaskListId}/tasks/{todoTaskId}"
-    headers = {
-        "Authorization": f"Bearer {token}"
-    }
-    return organize_result(response=requests.delete(url=url, headers=headers), expected_status_code=204)
+    headers = {"Authorization": f"Bearer {token}"}
+    return organize_result(
+        response=requests.delete(url=url, headers=headers), expected_status_code=204
+    )
+
+
 # ==================================================================================================
 
+
 ## Checklist item
-def list_checklist_items(token: str, userId: str, todoTaskListId: str, todoTaskId: str) -> dict:
+def list_checklist_items(
+    token: str, userId: str, todoTaskListId: str, todoTaskId: str
+) -> dict:
     """列出指定任务列表下指定任务的所有检查项
     :param token: 访问令牌
     :param userId: 用户ID
@@ -240,12 +272,15 @@ def list_checklist_items(token: str, userId: str, todoTaskListId: str, todoTaskI
     :return: 整理后的返回结果
     """
     url = f"{HOST}/users/{userId}/todo/lists/{todoTaskListId}/tasks/{todoTaskId}/checklistItems"
-    headers = {
-        "Authorization": f"Bearer {token}"
-    }
-    return organize_result(response=requests.get(url=url, headers=headers), expected_status_code=200)
+    headers = {"Authorization": f"Bearer {token}"}
+    return organize_result(
+        response=requests.get(url=url, headers=headers), expected_status_code=200
+    )
 
-def create_checklist_item(token: str, userId: str, todoTaskListId: str, todoTaskId: str, data: str) -> dict:
+
+def create_checklist_item(
+    token: str, userId: str, todoTaskListId: str, todoTaskId: str, data: str
+) -> dict:
     """创建一个指定任务列表下指定任务的检查项
     :param token: 访问令牌
     :param userId: 用户ID
@@ -255,13 +290,16 @@ def create_checklist_item(token: str, userId: str, todoTaskListId: str, todoTask
     :return: 整理后的返回结果
     """
     url = f"{HOST}/users/{userId}/todo/lists/{todoTaskListId}/tasks/{todoTaskId}/checklistItems"
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json"
-    }
-    return organize_result(response=requests.post(url=url, headers=headers, data=json.dumps(data)), expected_status_code=201)
+    headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+    return organize_result(
+        response=requests.post(url=url, headers=headers, data=json.dumps(data)),
+        expected_status_code=201,
+    )
 
-def get_checklist_item(token: str, userId: str, todoTaskListId: str, todoTaskId: str, checklistItemId: str) -> dict:
+
+def get_checklist_item(
+    token: str, userId: str, todoTaskListId: str, todoTaskId: str, checklistItemId: str
+) -> dict:
     """读取一个指定任务列表下指定任务中指定检查项的信息
     :param token: 访问令牌
     :param userId: 用户ID
@@ -272,12 +310,20 @@ def get_checklist_item(token: str, userId: str, todoTaskListId: str, todoTaskId:
     :return: 整理后的返回结果
     """
     url = f"{HOST}/users/{userId}/todo/lists/{todoTaskListId}/tasks/{todoTaskId}/checklistItems/{checklistItemId}"
-    headers = {
-        "Authorization": f"Bearer {token}"
-    }
-    return organize_result(response=requests.get(url=url, headers=headers), expected_status_code=200)
+    headers = {"Authorization": f"Bearer {token}"}
+    return organize_result(
+        response=requests.get(url=url, headers=headers), expected_status_code=200
+    )
 
-def update_checklist_item(token: str, userId: str, todoTaskListId: str, todoTaskId: str, checklistItemId: str, data: str) -> dict:
+
+def update_checklist_item(
+    token: str,
+    userId: str,
+    todoTaskListId: str,
+    todoTaskId: str,
+    checklistItemId: str,
+    data: str,
+) -> dict:
     """更新指定任务列表下指定任务的指定检查项
     :param token: 访问令牌
     :param userId: 用户ID
@@ -288,13 +334,16 @@ def update_checklist_item(token: str, userId: str, todoTaskListId: str, todoTask
     :return: 整理后的返回结果
     """
     url = f"{HOST}/users/{userId}/todo/lists/{todoTaskListId}/tasks/{todoTaskId}/checklistItems/{checklistItemId}"
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json"
-    }
-    return organize_result(response=requests.patch(url=url, headers=headers, data=json.dumps(data)), expected_status_code=200)
+    headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+    return organize_result(
+        response=requests.patch(url=url, headers=headers, data=json.dumps(data)),
+        expected_status_code=200,
+    )
 
-def delete_checklist_item(token: str, userId: str, todoTaskListId: str, todoTaskId: str, checklistItemId: str) -> dict:
+
+def delete_checklist_item(
+    token: str, userId: str, todoTaskListId: str, todoTaskId: str, checklistItemId: str
+) -> dict:
     """删除指定任务列表下指定任务的指定检查项
     :param token: 访问令牌
     :param userId: 用户ID
@@ -304,14 +353,17 @@ def delete_checklist_item(token: str, userId: str, todoTaskListId: str, todoTask
     :return: 整理后的返回结果
     """
     url = f"{HOST}/users/{userId}/todo/lists/{todoTaskListId}/tasks/{todoTaskId}/checklistItems/{checklistItemId}"
-    headers = {
-        "Authorization": f"Bearer {token}"
-    }
-    return organize_result(response=requests.delete(url=url, headers=headers), expected_status_code=204)
+    headers = {"Authorization": f"Bearer {token}"}
+    return organize_result(
+        response=requests.delete(url=url, headers=headers), expected_status_code=204
+    )
+
+
 # ==================================================================================================
 
 # Mail
 # Permission: Mail.Send
+
 
 ## Message
 def send_mail(token: str, userId: str, data: dict) -> dict:
@@ -322,9 +374,11 @@ def send_mail(token: str, userId: str, data: dict) -> dict:
     :return: 整理后的返回结果
     """
     url = f"{HOST}/users/{userId}/sendMail"
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json"
-    }
-    return organize_result(response=requests.post(url=url, headers=headers, data=json.dumps(data)), expected_status_code=202)
+    headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+    return organize_result(
+        response=requests.post(url=url, headers=headers, data=json.dumps(data)),
+        expected_status_code=202,
+    )
+
+
 # ==================================================================================================
