@@ -8,9 +8,12 @@ HOST = "https://graph.microsoft.com/v1.0"
 
 # Microsoft Graph API Permissions (Application permissions):
 # - User.ReadBasic.All
-# - Application.ReadWrite.OwnedBy
+# - Application.ReadAll
 # - Tasks.ReadWrite.All
 # - Mail.Send
+
+
+# =============================== Authentication and authorization =============================== #
 
 
 def organize_result(response: Response, expected_status_code: int) -> dict:
@@ -38,7 +41,6 @@ def organize_result(response: Response, expected_status_code: int) -> dict:
     return result
 
 
-# Authentication and authorization
 def get_credential(tenant: str, client_id: str, client_secret: str) -> dict:
     """获取凭证 (非登录认证)
     :param tenant: 租户名称, 通常为"xxx.onmicrosoft.com"
@@ -57,13 +59,14 @@ def get_credential(tenant: str, client_id: str, client_secret: str) -> dict:
     return organize_result(response=response, expected_status_code=200)
 
 
-# ==================================================================================================
+# =============================== Authentication and authorization =============================== #
 
-# Users
+
+# ======================================== Users -> User ========================================= #
 # Permission: User.ReadBasic.All
 
 
-## User
+## Users -> User -> List
 def list_users(token: str) -> dict:
     """列出所有用户
     :param token: 访问令牌
@@ -76,13 +79,13 @@ def list_users(token: str) -> dict:
     )
 
 
-# ==================================================================================================
+# ======================================== Users -> User ========================================= #
 
-# Applications
-# Permission: Application.ReadWrite.OwnedBy
+# ================================= Applications -> Application ================================== #
+# Permission: Application.ReadAll
 
 
-## Application
+## Applications -> Application -> Owners -> List
 def list_owners(token: str, client_id: str) -> dict:
     """列出指定应用的所有拥有者
     :param token: 访问令牌
@@ -96,13 +99,13 @@ def list_owners(token: str, client_id: str) -> dict:
     )
 
 
-# ==================================================================================================
+# ================================= Applications -> Application ================================== #
 
-# To-do tasks
+# ========================================= To-do tasks ========================================== #
 # Permission: Tasks.ReadWrite.All
 
 
-## To-do task list
+## To-do tasks -> To-do task list -> List task lists
 def list_task_lists(token: str, userId: str) -> dict:
     """列出所有任务列表
     :param token: 访问令牌
@@ -116,6 +119,7 @@ def list_task_lists(token: str, userId: str) -> dict:
     )
 
 
+## To-do tasks -> To-do task list -> Create task lists
 def create_task_list(token: str, userId: str, data: dict) -> dict:
     """创建一个任务列表
     :param token: 访问令牌
@@ -131,6 +135,7 @@ def create_task_list(token: str, userId: str, data: dict) -> dict:
     )
 
 
+## To-do tasks -> To-do task list -> Get task lists
 def get_task_list(token: str, userId: str, todoTaskListId: str) -> dict:
     """读取指定任务列表的信息
     :param token: 访问令牌
@@ -145,6 +150,7 @@ def get_task_list(token: str, userId: str, todoTaskListId: str) -> dict:
     )
 
 
+## To-do tasks -> To-do task list -> Update task lists
 def update_task_list(token: str, userId: str, todoTaskListId: str, data: dict) -> dict:
     """更新指定任务列表
     :param token: 访问令牌
@@ -161,6 +167,7 @@ def update_task_list(token: str, userId: str, todoTaskListId: str, data: dict) -
     )
 
 
+## To-do tasks -> To-do task list -> Delete task lists
 def delete_task_list(token: str, userId: str, todoTaskListId: str) -> dict:
     """删除指定任务列表
     :param token: 访问令牌
@@ -175,10 +182,7 @@ def delete_task_list(token: str, userId: str, todoTaskListId: str) -> dict:
     )
 
 
-# ==================================================================================================
-
-
-## To-do task
+## To-do tasks -> To-do task -> List tasks
 def list_tasks(token: str, userId: str, todoTaskListId: str) -> dict:
     """列出指定任务列表下的所有任务
     :param token: 访问令牌
@@ -193,6 +197,7 @@ def list_tasks(token: str, userId: str, todoTaskListId: str) -> dict:
     )
 
 
+## To-do tasks -> To-do task -> Create task
 def create_task(token: str, userId: str, todoTaskListId: str, data: dict) -> dict:
     """创建一个指定任务列表下的任务
     :param token: 访问令牌
@@ -209,6 +214,7 @@ def create_task(token: str, userId: str, todoTaskListId: str, data: dict) -> dic
     )
 
 
+## To-do tasks -> To-do task -> Get task
 def get_task(token: str, userId: str, todoTaskListId: str, todoTaskId: str) -> dict:
     """读取指定任务列表下指定任务的信息
     :param token: 访问令牌
@@ -224,6 +230,7 @@ def get_task(token: str, userId: str, todoTaskListId: str, todoTaskId: str) -> d
     )
 
 
+## To-do tasks -> To-do task -> Update task
 def update_task(
     token: str, userId: str, todoTaskListId: str, todoTaskId: str, data: dict
 ) -> dict:
@@ -243,6 +250,7 @@ def update_task(
     )
 
 
+## To-do tasks -> To-do task -> Delete task
 def delete_task(token: str, userId: str, todoTaskListId: str, todoTaskId: str) -> dict:
     """删除指定任务列表下的指定任务
     :param token: 访问令牌
@@ -258,10 +266,7 @@ def delete_task(token: str, userId: str, todoTaskListId: str, todoTaskId: str) -
     )
 
 
-# ==================================================================================================
-
-
-## Checklist item
+## To-do tasks -> Checklist item -> List
 def list_checklist_items(
     token: str, userId: str, todoTaskListId: str, todoTaskId: str
 ) -> dict:
@@ -279,6 +284,7 @@ def list_checklist_items(
     )
 
 
+## To-do tasks -> Checklist item -> Create
 def create_checklist_item(
     token: str, userId: str, todoTaskListId: str, todoTaskId: str, data: str
 ) -> dict:
@@ -298,6 +304,7 @@ def create_checklist_item(
     )
 
 
+## To-do tasks -> Checklist item -> Get
 def get_checklist_item(
     token: str, userId: str, todoTaskListId: str, todoTaskId: str, checklistItemId: str
 ) -> dict:
@@ -317,6 +324,7 @@ def get_checklist_item(
     )
 
 
+## To-do tasks -> Checklist item -> Update
 def update_checklist_item(
     token: str,
     userId: str,
@@ -342,6 +350,7 @@ def update_checklist_item(
     )
 
 
+## To-do tasks -> Checklist item -> Delete
 def delete_checklist_item(
     token: str, userId: str, todoTaskListId: str, todoTaskId: str, checklistItemId: str
 ) -> dict:
@@ -360,13 +369,13 @@ def delete_checklist_item(
     )
 
 
-# ==================================================================================================
+# ========================================= To-do tasks ========================================== #
 
-# Mail
+# ==================================== Users -> User -> Mail ===================================== #
 # Permission: Mail.Send
 
 
-## Message
+## Users -> User -> Mail -> Send mail
 def send_mail_json(
     token: str, userId: str, message: dict, saveToSentItems: bool = True
 ) -> dict:
@@ -389,6 +398,7 @@ def send_mail_json(
     )
 
 
+## Users -> User -> Mail -> Send mail
 def send_mail_mime(token: str, userId: str, mime: str) -> dict:
     """发送邮件 (MIME格式)
     :param token: 访问令牌
@@ -405,4 +415,4 @@ def send_mail_mime(token: str, userId: str, mime: str) -> dict:
     )
 
 
-# ==================================================================================================
+# ==================================== Users -> User -> Mail ===================================== #
